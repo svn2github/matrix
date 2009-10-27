@@ -1,0 +1,13 @@
+To use the library:
+
+The library is pure header files, so there is no need for compilation.
+Simply copy the include files to a folder and add the folder to the include path.
+
+
+To compile the samples:
+
+Samples can be compiled by calling the respective batch script in their folders. 
+The author has access to no compilers other than MSVC 2008 express and MinGW.
+So the samples have been compiled under those two compilers only.
+However, the code strives to be ISO standard comformant and compiler-neutral.
+A reasonable and recent compiler with enough support for templates should be able to compile.
