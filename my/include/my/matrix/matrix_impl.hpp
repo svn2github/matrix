@@ -102,6 +102,8 @@ public:
     // hermitian and conjugacy are derived from matrix_base<Ts, M, N, real_trait<Ts>::is_real>
     // no virtual function table is needed.
 
+    template <typename U, const std::size_t P, const std::size_t Q, const std::size_t X, const std::size_t Y> friend class matrix_slice;
+
 private:
 
     Ts* data_;

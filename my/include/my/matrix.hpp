@@ -45,6 +45,7 @@ THE SOFTWARE.
 #include "my/matrix/matrix_base.hpp"
 #include "my/matrix/matrix_impl.hpp"
 #include "my/matrix/matrix_non_mem_fun.hpp"
-
+#include "my/matrix/matrix_slice.hpp"
+#include "my/matrix/matrix_slice_interop.hpp"
 
 #endif // MY_MATRIX_HPP

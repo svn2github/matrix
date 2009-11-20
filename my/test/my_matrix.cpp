@@ -124,7 +124,7 @@ int main()
     test<int>();
     test<long>();
     test<long long>();
-    test<double>();
+    test<float>();
     test<double>();
     test<long double>();
     test<std::complex<float> >();
