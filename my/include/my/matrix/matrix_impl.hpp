@@ -31,6 +31,10 @@ THE SOFTWARE.
 
 namespace my {
 
+
+template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y> class matrix_slice;
+
+
 template <typename Ts, const std::size_t M, const std::size_t N>
 class matrix : public matrix_base<Ts, M, N, real_trait<Ts>::is_real>
 {
@@ -68,14 +72,18 @@ public:
     // index for inspector
     const Ts& operator() (const std::size_t i, const std::size_t j) const; 
 
+    // index slicing
+    template <std::size_t X, std::size_t Y> matrix_slice<Ts, M, N, X, Y> operator() (const std::size_t (&row)[X], const std::size_t (&col)[Y]);
+    template <std::size_t X, std::size_t Y> const matrix_slice<Ts, M, N, X, Y> operator() (const std::size_t (&row)[X], const std::size_t (&col)[Y]) const;
+
     matrix& operator= (const matrix &rhs);
     template<typename U> matrix& operator= (const matrix<U, M, N>& rhs); // with coercion.
 
-	matrix& operator= (const Ts(&a)[M][N]);
-    template<typename U> matrix& operator= (const U(&a)[M][N]); // with coercion.
+	// matrix& operator= (const Ts(&a)[M][N]);
+    // template<typename U> matrix& operator= (const U(&a)[M][N]); // with coercion.
 
-	matrix& operator= (const vector<Ts, M>(&a)[N]);
-    template<typename U> matrix& operator= (const vector<U, M>(&a)[N]); // with coercion.
+	// matrix& operator= (const vector<Ts, M>(&a)[N]);
+    // template<typename U> matrix& operator= (const vector<U, M>(&a)[N]); // with coercion.
 
     matrix& operator+= (const matrix &rhs);
     template<typename U> matrix& operator+= (const matrix<U, M, N>& rhs); // with coercion.
@@ -106,7 +114,8 @@ public:
 
 private:
 
-    Ts* data_;
+    Ts* data_; // pointer to POD
+    int* count_; // reference counting
 
 };
 
@@ -117,6 +126,7 @@ private:
 template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>::matrix()
 {
+    count_ = new int(1);
     data_ = new Ts[M*N];
     memset(data_, 0, sizeof(Ts) * M * N);
 }
@@ -125,6 +135,7 @@ matrix<Ts, M, N>::matrix()
 template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>::matrix(const Ts(&a)[M][N]) 
 {
+    count_ = new int(1);
     data_ = new Ts[M*N];
     memcpy(data_, a, sizeof(Ts) * M * N);
 }
@@ -134,6 +145,7 @@ template <typename Ts, const std::size_t M, const std::size_t N>
 template<typename U> 
 matrix<Ts, M, N>::matrix(const U(&a)[M][N])
 {
+    count_ = new int(1);
     data_ = new Ts[M*N];
 	for (std::size_t i = 0; i < M; ++i) {
 		for (std::size_t j = 0; j < N; ++j) {
@@ -146,6 +158,7 @@ matrix<Ts, M, N>::matrix(const U(&a)[M][N])
 template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>::matrix(const vector<Ts, M>(&a)[N]) // array of column vectors
 {
+    count_ = new int(1);
 	data_ = new Ts[M*N];
 	for (std::size_t i = 0; i < N; ++i) { // column
 		for (std::size_t j = 0; j < M; ++j) { // row
@@ -159,6 +172,7 @@ template <typename Ts, const std::size_t M, const std::size_t N>
 template<typename U> 
 matrix<Ts, M, N>::matrix(const vector<U, M>(&a)[N]) // array of column vectors, with coercion
 {
+    count_ = new int(1);
 	data_ = new Ts[M*N];
 	for (std::size_t i = 0; i < N; ++i) { // column
 		for (std::size_t j = 0; j < M; ++j) { // row
@@ -172,6 +186,7 @@ matrix<Ts, M, N>::matrix(const vector<U, M>(&a)[N]) // array of column vectors, 
 template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>::matrix(const vector<Ts, N>(&a)[M], bool dummy) // array of row vectors
 {
+    count_ = new int(1);
 	data_ = new Ts[M*N];
 	for (std::size_t i = 0; i < M; ++i) { // row
 
@@ -190,6 +205,7 @@ template <typename Ts, const std::size_t M, const std::size_t N>
 template<typename U> 
 matrix<Ts, M, N>::matrix(const vector<U, N>(&a)[M], bool dummy) // array of row vectors, with coercion
 {
+    count_ = new int(1);
 	data_ = new Ts[M*N];
 	for (std::size_t i = 0; i < M; ++i) { // row
 		for (std::size_t j = 0; j < N; ++j) { // column
@@ -202,9 +218,11 @@ matrix<Ts, M, N>::matrix(const vector<U, N>(&a)[M], bool dummy) // array of row 
 
 template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>::matrix(const matrix<Ts, M, N>& copy) // copy constructor
+: count_(copy.count_), data_(copy.data_)
 {
-    data_ = new Ts[M*N];
-    memcpy(data_, copy.data_, sizeof(Ts) * M * N);
+    ++*count_;
+    // data_ = new Ts[M*N];
+    // memcpy(data_, copy.data_, sizeof(Ts) * M * N);
 }
 
 
@@ -212,6 +230,7 @@ template <typename Ts, const std::size_t M, const std::size_t N>
 template<typename U> 
 matrix<Ts, M, N>::matrix(const matrix<U, M, N>& copy) // copy constructor, with coercion
 {
+    count_ = new int(1);
     data_ = new Ts[M*N];
 	for (std::size_t i = 0; i < M; ++i) {
 		for (std::size_t j = 0; j < N; ++j) {
@@ -225,7 +244,13 @@ matrix<Ts, M, N>::matrix(const matrix<U, M, N>& copy) // copy constructor, with 
 template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>::~matrix() 
 {
-    delete [] data_;
+    if (--*count_ == 0) {
+        delete count_;
+        delete[] data_;
+#ifdef COUTDELETE
+        std::cout << "delete[] data_" << std::endl;
+#endif
+    }
 }
 
 
@@ -241,8 +266,14 @@ matrix<Ts, M, N>:: operator() (const std::size_t i, const std::size_t j)
     }
 #endif
 
+    if (*count_ > 1) { // copy on write
+        Ts* cow_data_ = new Ts[M*N];
+        memcpy(cow_data_, data_, sizeof(Ts) * M * N);
+        data_ = cow_data_;
+        --*count_;
+        count_ = new int(1);
+    }
     return data_[i * N + j];
-
 }
 
 
@@ -264,13 +295,37 @@ matrix<Ts, M, N>:: operator() (const std::size_t i, const std::size_t j) const
 
 
 template <typename Ts, const std::size_t M, const std::size_t N>
+template <std::size_t X, std::size_t Y> 
+matrix_slice<Ts, M, N, X, Y> 
+matrix<Ts, M, N>:: operator() (const std::size_t (&row)[X], const std::size_t (&col)[Y])
+{
+    matrix_slice<Ts, M, N, X, Y> ret(*this, row, col);
+    return ret;
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N>
+template <std::size_t X, std::size_t Y> 
+const matrix_slice<Ts, M, N, X, Y> 
+matrix<Ts, M, N>:: operator() (const std::size_t (&row)[X], const std::size_t (&col)[Y]) const
+{
+    matrix_slice<Ts, M, N, X, Y> ret(*this, row, col);
+    return ret;
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>& 
 matrix<Ts, M, N>:: operator= (const matrix<Ts, M, N> &rhs)  // assignment operator
 {
-
-    if (this != &rhs) { // check for self-assignment
-        memcpy( data_, rhs.data_, sizeof(Ts) * M * N );
+    Ts* old_ = data_; // save ptr to old data
+    data_ = rhs.data_; // point to new data
+    ++*rhs.count_; // update ref count for new data *before* dec ref count for old data
+    if (--*count_ == 0) { // if ref count for old data drops to zero, destroys old data
+        delete count_;
+        delete[] old_;
     }
+    count_ = rhs.count_; // point to the corresponding ref count
 
     return *this;
 }
@@ -283,62 +338,7 @@ matrix<Ts, M, N>:: operator= (const matrix<U, M, N> &rhs) // assignment, with co
 {
 	for (std::size_t i = 0; i < M; ++i) {
 		for (std::size_t j = 0; j < N; ++j) {
-			data_[i * N + j] = static_cast<Ts>(rhs(i, j));
-		}
-	}
-
-    return *this;
-}
-
-
-
-template <typename Ts, const std::size_t M, const std::size_t N>
-matrix<Ts, M, N>& 
-matrix<Ts, M, N>:: operator= (const Ts(&a)[M][N])  // assignment from 2-D array (shallow-copy)
-{
-	memcpy( data_, a, sizeof(Ts) * M * N );
-	return *this;
-}
-
-
-template <typename Ts, const std::size_t M, const std::size_t N>
-template<typename U> 
-matrix<Ts, M, N>& 
-matrix<Ts, M, N>:: operator= (const U(&a)[M][N])  // assignment from 2-D array, with coercion
-{
-	for (std::size_t i = 0; i < M; ++i) {
-		for (std::size_t j = 0; j < N; ++j) {
-			data_[i * N + j] = static_cast<Ts>(a[i][j]);
-		}
-	}
-
-    return *this;
-}
-
-
-
-template <typename Ts, const std::size_t M, const std::size_t N>
-matrix<Ts, M, N>& 
-matrix<Ts, M, N>:: operator= (const vector<Ts, M>(&a)[N]) // assignment from array of column vectors
-{
-	for (std::size_t i = 0; i < N; ++i) { // column
-		for (std::size_t j = 0; j < M; ++j) { // row
-			data_[j * N + i] = a[i](j);
-		}
-	}
-
-	return *this;
-}
-
-
-template <typename Ts, const std::size_t M, const std::size_t N>
-template<typename U> 
-matrix<Ts, M, N>& 
-matrix<Ts, M, N>:: operator= (const vector<U, M>(&a)[N]) // assignment from array of column vectors, with coercion
-{
-	for (std::size_t i = 0; i < N; ++i) { // column
-		for (std::size_t j = 0; j < M; ++j) { // row
-			data_[j * N + i] = static_cast<Ts>(a[i](j));
+			(*this)(i,j) = static_cast<Ts>(rhs(i, j));
 		}
 	}
 
@@ -350,10 +350,11 @@ template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>& 
 matrix<Ts, M, N>:: operator+= (const matrix<Ts, M, N> &rhs) 
 {
-    Ts* const end = data_ + M * N;
-    Ts* p = data_;
-    const Ts* q = rhs.data_;
-    while (p < end) { *p++ += *q++; }
+   	for (std::size_t i = 0; i < M; ++i) {
+		for (std::size_t j = 0; j < N; ++j) {
+			(*this)(i,j) += rhs(i, j);
+		}
+	}
 
     return *this;
 }
@@ -366,7 +367,7 @@ matrix<Ts, M, N>:: operator+= (const matrix<U, M, N>& rhs) // with coercion.
 {
 	for (std::size_t i = 0; i < M; ++i) {
 		for (std::size_t j = 0; j < N; ++j) {
-			data_[i * N + j] += static_cast<Ts>(rhs(i, j));
+			(*this)(i,j) += static_cast<Ts>(rhs(i, j));
 		}
 	}
 
@@ -376,12 +377,13 @@ matrix<Ts, M, N>:: operator+= (const matrix<U, M, N>& rhs) // with coercion.
 
 template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>& 
-matrix<Ts, M, N>:: operator-= (const matrix<Ts, M, N> &rhs) {
-
-    Ts* const end = data_ + M * N;
-    Ts* p = data_;
-    const Ts* q = rhs.data_;
-    while (p < end) { *p++ -= *q++; }
+matrix<Ts, M, N>:: operator-= (const matrix<Ts, M, N> &rhs)
+{
+   	for (std::size_t i = 0; i < M; ++i) {
+		for (std::size_t j = 0; j < N; ++j) {
+			(*this)(i,j) -= rhs(i, j);
+		}
+	}
 
     return *this;
 }
@@ -394,7 +396,7 @@ matrix<Ts, M, N>:: operator-= (const matrix<U, M, N>& rhs) // with coercion.
 {
 	for (std::size_t i = 0; i < M; ++i) {
 		for (std::size_t j = 0; j < N; ++j) {
-			data_[i * N + j] -= static_cast<Ts>(rhs(i, j));
+			(*this)(i,j) -= static_cast<Ts>(rhs(i, j));
 		}
 	}
 
@@ -406,9 +408,11 @@ template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>& 
 matrix<Ts, M, N>:: operator*= (const Ts &rhs) 
 {
-    Ts* const end = data_ + M * N;
-    Ts* p = data_;
-    while (p < end) { *p++ *= rhs; }
+   	for (std::size_t i = 0; i < M; ++i) {
+		for (std::size_t j = 0; j < N; ++j) {
+			(*this)(i,j) *= rhs;
+		}
+	}
 
     return *this;
 }
@@ -419,12 +423,6 @@ template<typename U>
 matrix<Ts, M, N>& 
 matrix<Ts, M, N>:: operator*= (const U &rhs) // with coercion
 {
-    /*
-    Ts* const end = data_ + M * N;
-    Ts* p = data_;
-    while (p < end) { *p++ *= rhs; }
-    */
-
     (*this) *= static_cast<Ts>(rhs);
     return *this;
 }

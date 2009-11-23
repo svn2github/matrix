@@ -18,12 +18,16 @@ void foo(T(&a)[M][N], U dummy)
     my::matrix<T,M,N> m( (const T(&)[M][N]) a[0][0] );
     my::matrix<U,M,N> p( m );
 
+    // explicit usage of matrix_slice objects 
+    // is for testing purpose only
+    // use 'matrix-name(row-indices, col-indices)' for client code
     my::matrix_slice<T,M,N,countof(s),countof(s)> ms1(m, s, s);
     my::matrix_slice<T,M,N,countof(s),countof(t)> ms2(m, s, t);
     my::matrix_slice<T,M,N,countof(t),countof(s)> ms3(m, t, s);
     my::matrix_slice<T,M,N,countof(t),countof(t)> ms4(m, t, t);
 
-    my::matrix_slice<U,M,N,countof(s),countof(s)> ms(m, s, s);
+    // not quite sensible to get slice of type U from matrix of type T
+    // my::matrix_slice<U,M,N,countof(s),countof(s)> ms(m, s, s);
 
     std::cout << " m = \n" << m << std::endl;
     std::cout << " ms1 = \n" << ms1 << std::endl;
@@ -36,9 +40,9 @@ void foo(T(&a)[M][N], U dummy)
     ms1 + ms2; ms3 - ms4;
     ms2 * ms3; ms3 * ms2;
 
-    ms1 + ms; ms1 - ms; 
-    ms + ms1; ms - ms1;
-    ms1 * ms; ms * ms1;
+    // ms1 + ms; ms1 - ms; 
+    // ms + ms1; ms - ms1;
+    // ms1 * ms; ms * ms1;
 
     ms1 *= 1;
     ms1 *= 1L;

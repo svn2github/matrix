@@ -46,7 +46,7 @@ public:
     static const std::size_t sizec = Y;
 
 public:
-    matrix_slice(const matrix<Ts,M,N>&mat, const std::size_t (&row)[X], const std::size_t (&col)[Y]);
+    matrix_slice(matrix<Ts,M,N>&mat, const std::size_t (&row)[X], const std::size_t (&col)[Y]);
     ~matrix_slice();
 
 
@@ -71,26 +71,28 @@ public:
 
 private:
 
-    Ts* data_;
-    size_t row_offset_[M];
-    size_t col_offset_[N];
+    matrix<Ts,M,N>& mat_;
+    size_t row_index_[M];
+    size_t col_index_[N];
 
 };
 
+
+// constructor
 template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
-matrix_slice<Ts,M,N,X,Y>:: matrix_slice (const matrix<Ts,M,N>&mat, const std::size_t (&row)[X], const std::size_t (&col)[Y])
-: data_(mat.data_)
+matrix_slice<Ts,M,N,X,Y>:: matrix_slice (matrix<Ts,M,N>&mat, const std::size_t (&row)[X], const std::size_t (&col)[Y])
+: mat_(mat)
 {
 #if defined(DEBUG)
     for (std::size_t i = 0; i < M; ++i) row_offset_[i] = ((std::size_t)-1);
     for (std::size_t i = 0; i < N; ++i) col_offset_[i] = ((std::size_t)-1);
 #endif
     for (std::size_t i = 0; i < M && i < X; ++i) {
-        row_offset_[i] = row[i] * N;
+        row_index_[i] = row[i];
     }
 
     for (std::size_t j = 0; j < N && j < Y; ++j) {
-        col_offset_[j] = col[j];// * M;
+        col_index_[j] = col[j];
     }
 }
 
@@ -109,7 +111,7 @@ template <typename Ts, const std::size_t M, const std::size_t N, const std::size
 Ts& 
 matrix_slice<Ts,M,N,X,Y>:: operator() (const std::size_t i, const std::size_t j) 
 {
-    return data_[row_offset_[i] + col_offset_[j]];
+    return mat_(row_index_[i], col_index_[j]);
 }
 
 
@@ -118,8 +120,7 @@ template <typename Ts, const std::size_t M, const std::size_t N, const std::size
 const Ts& 
 matrix_slice<Ts,M,N,X,Y>:: operator() (const std::size_t i, const std::size_t j) const 
 {
-    return data_[row_offset_[i] + col_offset_[j]];
-
+    return mat_(row_index_[i], col_index_[j]);
 }
 
 
@@ -129,7 +130,7 @@ matrix_slice<Ts,M,N,X,Y>:: operator= (const matrix<Ts, X, Y> &rhs)  // assignmen
 {
 	for (std::size_t i = 0; i < X; ++i) {
 		for (std::size_t j = 0; j < Y; ++j) {
-			data_[row_offset_[i] + col_offset_[j]] = rhs(i, j);
+			(*this)(i,j) = rhs(i, j); // data_[row_offset_[i] + col_offset_[j]] = rhs(i, j);
 		}
 	}
 
@@ -144,7 +145,7 @@ matrix_slice<Ts,M,N,X,Y>:: operator= (const matrix<U, X, Y> &rhs) // assignment,
 {
 	for (std::size_t i = 0; i < X; ++i) {
 		for (std::size_t j = 0; j < Y; ++j) {
-			data_[row_offset_[i] + col_offset_[j]] = static_cast<Ts>(rhs(i, j));
+			(*this)(i,j) = static_cast<Ts>(rhs(i, j)); // data_[row_offset_[i] + col_offset_[j]] = static_cast<Ts>(rhs(i, j));
 		}
 	}
 
@@ -159,7 +160,7 @@ matrix_slice<Ts,M,N,X,Y>:: operator+= (const matrix<Ts, X, Y> &rhs)
 {
 	for (std::size_t i = 0; i < X; ++i) {
 		for (std::size_t j = 0; j < Y; ++j) {
-			data_[row_offset_[i] + col_offset_[j]] += rhs(i, j);
+			(*this)(i,j) += rhs(i, j); // data_[row_offset_[i] + col_offset_[j]] += rhs(i, j);
 		}
 	}
 
@@ -174,7 +175,7 @@ matrix_slice<Ts,M,N,X,Y>:: operator+= (const matrix<U, X, Y> &rhs) // with coerc
 {
 	for (std::size_t i = 0; i < X; ++i) {
 		for (std::size_t j = 0; j < Y; ++j) {
-			data_[row_offset_[i] + col_offset_[j]] += static_cast<Ts>(rhs(i, j));
+			(*this)(i,j) += static_cast<Ts>(rhs(i, j)); // data_[row_offset_[i] + col_offset_[j]] += static_cast<Ts>(rhs(i, j));
 		}
 	}
 
@@ -188,7 +189,7 @@ matrix_slice<Ts,M,N,X,Y>:: operator-= (const matrix<Ts, X, Y> &rhs)
 {
 	for (std::size_t i = 0; i < X; ++i) {
 		for (std::size_t j = 0; j < Y; ++j) {
-			data_[row_offset_[i] + col_offset_[j]] -= rhs(i, j);
+			(*this)(i,j) -= rhs(i, j); // data_[row_offset_[i] + col_offset_[j]] -= rhs(i, j);
 		}
 	}
 
@@ -203,7 +204,7 @@ matrix_slice<Ts,M,N,X,Y>:: operator-= (const matrix<U, X, Y> &rhs) // with coerc
 {
 	for (std::size_t i = 0; i < X; ++i) {
 		for (std::size_t j = 0; j < Y; ++j) {
-			data_[row_offset_[i] + col_offset_[j]] -= static_cast<Ts>(rhs(i, j));
+			(*this)(i,j) -= static_cast<Ts>(rhs(i, j)); // data_[row_offset_[i] + col_offset_[j]] -= static_cast<Ts>(rhs(i, j));
 		}
 	}
 
@@ -217,7 +218,7 @@ matrix_slice<Ts,M,N,X,Y>:: operator*= (const Ts &rhs)
 {
 	for (std::size_t i = 0; i < X; ++i) {
 		for (std::size_t j = 0; j < Y; ++j) {
-			data_[row_offset_[i] + col_offset_[j]] *= rhs;
+			(*this)(i,j) *= rhs; // data_[row_offset_[i] + col_offset_[j]] *= rhs;
 		}
 	}
 

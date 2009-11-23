@@ -18,8 +18,9 @@ void foo(S(&a)[M][N], T t, U u)
     my::matrix<U,N,M> n( (const S(&)[N][M]) a[0][0] );
     my::matrix<T,N,M> q(n);
 
-    p = (const S(&)[M][N]) a[0][0];
-    q = (const S(&)[N][M]) a[0][0];
+    // support for assignment from array types is removed 
+    // p = (const S(&)[M][N]) a[0][0];
+    // q = (const S(&)[N][M]) a[0][0];
 
     std::cout << " p = \n" << p << std::endl;
     std::cout << " q = \n" << q << std::endl;
