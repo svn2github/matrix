@@ -13,8 +13,6 @@ A fourth order Runge-Kutta ODE solver (using just the vector portion of the libr
 
 What to do next (and what not to do):
 
-MATLAB style slicing and Copy-On-Write is under consideration.
-
-Matrix decomositions, i.e. LU, QR, EVD, SVD, etc. are certainly desired. It's more likely I'll interface with mature numerical libraries rather than roll my own.
+Matrix decomositions, i.e. LU, QR, EVD, SVD, etc. 
 
 Advanced template techniques (like expression template) are absent and will unlikely be considered. 
