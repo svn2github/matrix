@@ -84,8 +84,8 @@ matrix_slice<Ts,M,N,X,Y>:: matrix_slice (matrix<Ts,M,N>&mat, const std::size_t (
 : mat_(mat)
 {
 #if defined(DEBUG)
-    for (std::size_t i = 0; i < M; ++i) row_offset_[i] = ((std::size_t)-1);
-    for (std::size_t i = 0; i < N; ++i) col_offset_[i] = ((std::size_t)-1);
+    for (std::size_t i = 0; i < M; ++i) row_index_[i] = ((std::size_t)-1);
+    for (std::size_t i = 0; i < N; ++i) col_index_[i] = ((std::size_t)-1);
 #endif
     for (std::size_t i = 0; i < M && i < X; ++i) {
         row_index_[i] = row[i];
