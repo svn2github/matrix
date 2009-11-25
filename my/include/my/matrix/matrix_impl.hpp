@@ -44,7 +44,7 @@ public:
     typedef Ts scalar_type;
 
     static const std::size_t size1 = M;
-	static const std::size_t size2 = N;
+    static const std::size_t size2 = N;
 
     matrix();
 
@@ -57,7 +57,7 @@ public:
     template<typename U> matrix(const vector<U, M>(&a)[N]);
 
     // construct from an array of row vectors
-	matrix(const vector<Ts, N>(&a)[M], bool dummy); 
+    matrix(const vector<Ts, N>(&a)[M], bool dummy); 
     template<typename U> matrix(const vector<U, N>(&a)[M], bool dummy);
 
     // construct from another matrix
@@ -87,10 +87,10 @@ public:
     // but works by way of implicit conversion of rhs to tmp matrix and assignment of lhs from tmp matrix
     // this is inexpensive as matrix data are reference counted
 
-	// matrix& operator= (const Ts(&a)[M][N]);
+    // matrix& operator= (const Ts(&a)[M][N]);
     // template<typename U> matrix& operator= (const U(&a)[M][N]);
 
-	// matrix& operator= (const vector<Ts, M>(&a)[N]);
+    // matrix& operator= (const vector<Ts, M>(&a)[N]);
     // template<typename U> matrix& operator= (const vector<U, M>(&a)[N]);
 
     matrix& operator+= (const matrix &rhs);
@@ -113,7 +113,7 @@ public:
     // matrix multiplication is not a member function
 
     const Ts norm() const; // Frobenius norm (for computational simplicity)
-	const matrix<Ts, N, M> T() const; // transpose
+    const matrix<Ts, N, M> T() const; // transpose
 
     // hermitian and conjugacy are derived from matrix_base<Ts, M, N, real_trait<Ts>::is_real>
     // no virtual function table is needed.
@@ -155,11 +155,11 @@ matrix<Ts, M, N>::matrix(const U(&a)[M][N])
 {
     count_ = new int(1);
     data_ = new Ts[M*N];
-	for (std::size_t i = 0; i < M; ++i) {
-		for (std::size_t j = 0; j < N; ++j) {
-			data_[i * N + j] = static_cast<Ts>(a[i][j]);
-		}
-	}
+    for (std::size_t i = 0; i < M; ++i) {
+        for (std::size_t j = 0; j < N; ++j) {
+            data_[i * N + j] = static_cast<Ts>(a[i][j]);
+        }
+    }
 }
 
 
@@ -167,12 +167,12 @@ template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>::matrix(const vector<Ts, M>(&a)[N]) // array of column vectors
 {
     count_ = new int(1);
-	data_ = new Ts[M*N];
-	for (std::size_t i = 0; i < N; ++i) { // column
-		for (std::size_t j = 0; j < M; ++j) { // row
-			data_[j * N + i] = a[i](j);
-		}
-	}
+    data_ = new Ts[M*N];
+    for (std::size_t i = 0; i < N; ++i) { // column
+        for (std::size_t j = 0; j < M; ++j) { // row
+            data_[j * N + i] = a[i](j);
+        }
+    }
 }
 
 
@@ -181,12 +181,12 @@ template<typename U>
 matrix<Ts, M, N>::matrix(const vector<U, M>(&a)[N]) // array of column vectors
 {
     count_ = new int(1);
-	data_ = new Ts[M*N];
-	for (std::size_t i = 0; i < N; ++i) { // column
-		for (std::size_t j = 0; j < M; ++j) { // row
-			data_[j * N + i] = static_cast<Ts>(a[i](j));
-		}
-	}
+    data_ = new Ts[M*N];
+    for (std::size_t i = 0; i < N; ++i) { // column
+        for (std::size_t j = 0; j < M; ++j) { // row
+            data_[j * N + i] = static_cast<Ts>(a[i](j));
+        }
+    }
 }
 
 
@@ -195,12 +195,12 @@ template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>::matrix(const vector<Ts, N>(&a)[M], bool dummy) // array of row vectors
 {
     count_ = new int(1);
-	data_ = new Ts[M*N];
-	for (std::size_t i = 0; i < M; ++i) { // row
-		for (std::size_t j = 0; j < N; ++j) { // column
-			data_[i * N + j] = a[i](j);
-		}
-	}
+    data_ = new Ts[M*N];
+    for (std::size_t i = 0; i < M; ++i) { // row
+        for (std::size_t j = 0; j < N; ++j) { // column
+            data_[i * N + j] = a[i](j);
+        }
+    }
 
 }
 
@@ -210,12 +210,12 @@ template<typename U>
 matrix<Ts, M, N>::matrix(const vector<U, N>(&a)[M], bool dummy) // array of row vectors
 {
     count_ = new int(1);
-	data_ = new Ts[M*N];
-	for (std::size_t i = 0; i < M; ++i) { // row
-		for (std::size_t j = 0; j < N; ++j) { // column
-			data_[i * N + j] = static_cast<Ts>(a[i](j));
-		}
-	}
+    data_ = new Ts[M*N];
+    for (std::size_t i = 0; i < M; ++i) { // row
+        for (std::size_t j = 0; j < N; ++j) { // column
+            data_[i * N + j] = static_cast<Ts>(a[i](j));
+        }
+    }
 
 }
 
@@ -234,11 +234,11 @@ matrix<Ts, M, N>::matrix(const matrix<U, M, N>& copy) // copy constructor
 {
     count_ = new int(1);
     data_ = new Ts[M*N];
-	for (std::size_t i = 0; i < M; ++i) {
-		for (std::size_t j = 0; j < N; ++j) {
-			data_[i * N + j] = static_cast<Ts>(copy(i, j));
-		}
-	}    
+    for (std::size_t i = 0; i < M; ++i) {
+        for (std::size_t j = 0; j < N; ++j) {
+            data_[i * N + j] = static_cast<Ts>(copy(i, j));
+        }
+    }    
 }
 
 
@@ -248,11 +248,11 @@ matrix<Ts, M, N>:: matrix(const matrix_slice<Ts,K,L,M,N>& s) // construct from m
 {
     count_ = new int(1);
     data_ = new Ts[M*N];
-	for (std::size_t i = 0; i < M; ++i) {
-		for (std::size_t j = 0; j < N; ++j) {
-			data_[i * N + j] = s(i, j);
-		}
-	}
+    for (std::size_t i = 0; i < M; ++i) {
+        for (std::size_t j = 0; j < N; ++j) {
+            data_[i * N + j] = s(i, j);
+        }
+    }
 }
 
 
@@ -262,11 +262,11 @@ matrix<Ts, M, N>:: matrix(const matrix_slice<U,K,L,M,N>& s) // construct from ma
 {
     count_ = new int(1);
     data_ = new Ts[M*N];
-	for (std::size_t i = 0; i < M; ++i) {
-		for (std::size_t j = 0; j < N; ++j) {
-			data_[i * N + j] = static_cast<Ts>(s(i, j));
-		}
-	}
+    for (std::size_t i = 0; i < M; ++i) {
+        for (std::size_t j = 0; j < N; ++j) {
+            data_[i * N + j] = static_cast<Ts>(s(i, j));
+        }
+    }
 }
 
 
@@ -366,11 +366,11 @@ template<typename U>
 matrix<Ts, M, N>& 
 matrix<Ts, M, N>:: operator= (const matrix<U, M, N> &rhs) // assignment
 {
-	for (std::size_t i = 0; i < M; ++i) {
-		for (std::size_t j = 0; j < N; ++j) {
-			(*this)(i,j) = static_cast<Ts>(rhs(i, j));
-		}
-	}
+    for (std::size_t i = 0; i < M; ++i) {
+        for (std::size_t j = 0; j < N; ++j) {
+            (*this)(i,j) = static_cast<Ts>(rhs(i, j));
+        }
+    }
 
     return *this;
 }
@@ -380,11 +380,11 @@ template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>& 
 matrix<Ts, M, N>:: operator+= (const matrix<Ts, M, N> &rhs) 
 {
-   	for (std::size_t i = 0; i < M; ++i) {
-		for (std::size_t j = 0; j < N; ++j) {
-			(*this)(i,j) += rhs(i, j);
-		}
-	}
+       for (std::size_t i = 0; i < M; ++i) {
+        for (std::size_t j = 0; j < N; ++j) {
+            (*this)(i,j) += rhs(i, j);
+        }
+    }
 
     return *this;
 }
@@ -395,11 +395,11 @@ template<typename U>
 matrix<Ts, M, N>& 
 matrix<Ts, M, N>:: operator+= (const matrix<U, M, N>& rhs)
 {
-	for (std::size_t i = 0; i < M; ++i) {
-		for (std::size_t j = 0; j < N; ++j) {
-			(*this)(i,j) += static_cast<Ts>(rhs(i, j));
-		}
-	}
+    for (std::size_t i = 0; i < M; ++i) {
+        for (std::size_t j = 0; j < N; ++j) {
+            (*this)(i,j) += static_cast<Ts>(rhs(i, j));
+        }
+    }
 
     return *this;
 }
@@ -409,11 +409,11 @@ template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>& 
 matrix<Ts, M, N>:: operator-= (const matrix<Ts, M, N> &rhs)
 {
-   	for (std::size_t i = 0; i < M; ++i) {
-		for (std::size_t j = 0; j < N; ++j) {
-			(*this)(i,j) -= rhs(i, j);
-		}
-	}
+       for (std::size_t i = 0; i < M; ++i) {
+        for (std::size_t j = 0; j < N; ++j) {
+            (*this)(i,j) -= rhs(i, j);
+        }
+    }
 
     return *this;
 }
@@ -424,11 +424,11 @@ template<typename U>
 matrix<Ts, M, N>& 
 matrix<Ts, M, N>:: operator-= (const matrix<U, M, N>& rhs)
 {
-	for (std::size_t i = 0; i < M; ++i) {
-		for (std::size_t j = 0; j < N; ++j) {
-			(*this)(i,j) -= static_cast<Ts>(rhs(i, j));
-		}
-	}
+    for (std::size_t i = 0; i < M; ++i) {
+        for (std::size_t j = 0; j < N; ++j) {
+            (*this)(i,j) -= static_cast<Ts>(rhs(i, j));
+        }
+    }
 
     return *this;
 }
@@ -438,11 +438,11 @@ template <typename Ts, const std::size_t M, const std::size_t N>
 matrix<Ts, M, N>& 
 matrix<Ts, M, N>:: operator*= (const Ts &rhs) 
 {
-   	for (std::size_t i = 0; i < M; ++i) {
-		for (std::size_t j = 0; j < N; ++j) {
-			(*this)(i,j) *= rhs;
-		}
-	}
+       for (std::size_t i = 0; i < M; ++i) {
+        for (std::size_t j = 0; j < N; ++j) {
+            (*this)(i,j) *= rhs;
+        }
+    }
 
     return *this;
 }
@@ -513,13 +513,13 @@ template <typename Ts, const std::size_t M, const std::size_t N>
 const matrix<Ts, N, M>
 matrix<Ts, M, N>::T() const 
 {
-	matrix<Ts, N, M> ret;
-	for (std::size_t i = 0; i < M; ++i) {
-		for (std::size_t j = 0; j < N; ++j) {
-			ret(j,i) = (*this)(i,j);
-		}
-	}
-	return ret;
+    matrix<Ts, N, M> ret;
+    for (std::size_t i = 0; i < M; ++i) {
+        for (std::size_t j = 0; j < N; ++j) {
+            ret(j,i) = (*this)(i,j);
+        }
+    }
+    return ret;
 }
 
 

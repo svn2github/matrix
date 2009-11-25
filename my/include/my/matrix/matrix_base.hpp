@@ -38,8 +38,8 @@ namespace my {
     protected:
         ~matrix_base() {} // dtor intended non-virtual.
 
-	    const matrix<Ts, N, M> H() const; // hermitian (conjugate transpose)
-	    const matrix<Ts, M, N> conj() const; // conjugate
+        const matrix<Ts, N, M> H() const; // hermitian (conjugate transpose)
+        const matrix<Ts, M, N> conj() const; // conjugate
     };
 
     // specialization for real matrices
@@ -47,8 +47,8 @@ namespace my {
     class matrix_base<Ts, M, N, true>
     {
     public:
-    	const matrix<Ts, N, M> H() const; // hermitian (conjugate transpose)
-    	const matrix<Ts, M, N> conj() const; // conjugate
+        const matrix<Ts, N, M> H() const; // hermitian (conjugate transpose)
+        const matrix<Ts, M, N> conj() const; // conjugate
     };
 
 
@@ -57,8 +57,8 @@ namespace my {
     class matrix_base<Ts, M, N, false>
     {
     public:
-    	const matrix<Ts, N, M> H() const; // hermitian (conjugate transpose)
-    	const matrix<Ts, M, N> conj() const; // conjugate
+        const matrix<Ts, N, M> H() const; // hermitian (conjugate transpose)
+        const matrix<Ts, M, N> conj() const; // conjugate
     };
 
     //////// //////// //////// //////// 
@@ -72,13 +72,13 @@ namespace my {
     const matrix<Ts, N, M>
     matrix_base<Ts, M, N, false>::H() const 
     {
-    	matrix<Ts, N, M> ret;
-    	for (std::size_t i = 0; i < M; ++i) {
-		    for (std::size_t j = 0; j < N; ++j) {
-    			ret(j,i) = std::conj((*static_cast<const matrix<Ts,M,N>*>(this))(i,j));
-		    }
-	    }
-	    return ret;
+        matrix<Ts, N, M> ret;
+        for (std::size_t i = 0; i < M; ++i) {
+            for (std::size_t j = 0; j < N; ++j) {
+                ret(j,i) = std::conj((*static_cast<const matrix<Ts,M,N>*>(this))(i,j));
+            }
+        }
+        return ret;
     }
 
 
@@ -104,13 +104,13 @@ namespace my {
     const matrix<Ts, M, N>
     matrix_base<Ts, M, N, false>::conj() const 
     {
-    	matrix<Ts, M, N> ret;
-    	for (std::size_t i = 0; i < M; ++i) {
-		    for (std::size_t j = 0; j < N; ++j) {
-    			ret(i,j) = std::conj((*static_cast<const matrix<Ts,M,N>*>(this))(i,j));
-		    }
-	    }
-	    return ret;
+        matrix<Ts, M, N> ret;
+        for (std::size_t i = 0; i < M; ++i) {
+            for (std::size_t j = 0; j < N; ++j) {
+                ret(i,j) = std::conj((*static_cast<const matrix<Ts,M,N>*>(this))(i,j));
+            }
+        }
+        return ret;
     }
 
     //////// //////// //////// //////// 

@@ -53,10 +53,10 @@ operator+ (const matrix_slice<T,M,N,X,Y> &A, const matrix_slice<T,P,Q,X,Y> &B)
     matrix<T, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = A(i,j) + B(i,j);
-		}
-	}
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = A(i,j) + B(i,j);
+        }
+    }
 
     return ret;
 }
@@ -70,10 +70,10 @@ operator+ (const matrix<T,X,Y> &A, const matrix_slice<T,P,Q,X,Y> &B)
     matrix<T, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = A(i,j) + B(i,j);
-		}
-	}
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = A(i,j) + B(i,j);
+        }
+    }
 
     return ret;
 }
@@ -87,10 +87,10 @@ operator+ (const matrix_slice<T,M,N,X,Y> &A, const matrix<T,X,Y> &B)
     matrix<T, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = A(i,j) + B(i,j);
-		}
-	}
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = A(i,j) + B(i,j);
+        }
+    }
 
     return ret;
 }
@@ -104,11 +104,11 @@ operator+ (const matrix_slice<T1,M,N,X,Y> &A, const matrix_slice<T2,P,Q,X,Y> &B)
     matrix<typename promotion_trait<T1,T2>::promoted_type, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, j)) + 
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, j)) + 
                 static_cast<typename promotion_trait<T1,T2>::promoted_type>(B(i, j));
-		}
-	}
+        }
+    }
 
     return ret;
 }
@@ -122,11 +122,11 @@ operator+ (const matrix<T1,X,Y> &A, const matrix_slice<T2,P,Q,X,Y> &B)
     matrix<typename promotion_trait<T1,T2>::promoted_type, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, j)) + 
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, j)) + 
                 static_cast<typename promotion_trait<T1,T2>::promoted_type>(B(i, j));
-		}
-	}
+        }
+    }
 
     return ret;
 }
@@ -140,11 +140,11 @@ operator+ (const matrix_slice<T1,M,N,X,Y> &A, const matrix<T2,X,Y> &B)
     matrix<typename promotion_trait<T1,T2>::promoted_type, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, j)) + 
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, j)) + 
                 static_cast<typename promotion_trait<T1,T2>::promoted_type>(B(i, j));
-		}
-	}
+        }
+    }
 
     return ret;
 }
@@ -162,10 +162,10 @@ operator- (const matrix_slice<T,M,N,X,Y> &A, const matrix_slice<T,P,Q,X,Y> &B)
     matrix<T, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = A(i,j) - B(i,j);
-		}
-	}
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = A(i,j) - B(i,j);
+        }
+    }
 
     return ret;
 }
@@ -179,10 +179,10 @@ operator- (const matrix<T,X,Y> &A, const matrix_slice<T,P,Q,X,Y> &B)
     matrix<T, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = A(i,j) - B(i,j);
-		}
-	}
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = A(i,j) - B(i,j);
+        }
+    }
 
     return ret;
 }
@@ -196,10 +196,10 @@ operator- (const matrix_slice<T,M,N,X,Y> &A, const matrix<T,X,Y> &B)
     matrix<T, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = A(i,j) - B(i,j);
-		}
-	}
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = A(i,j) - B(i,j);
+        }
+    }
 
     return ret;
 }
@@ -212,11 +212,11 @@ operator- (const matrix_slice<T1,M,N,X,Y> &A, const matrix_slice<T2,P,Q,X,Y> &B)
     matrix<typename promotion_trait<T1,T2>::promoted_type, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, j)) - 
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, j)) - 
                 static_cast<typename promotion_trait<T1,T2>::promoted_type>(B(i, j));
-		}
-	}
+        }
+    }
 
     return ret;
 }
@@ -230,11 +230,11 @@ operator- (const matrix<T1,X,Y> &A, const matrix_slice<T2,P,Q,X,Y> &B)
     matrix<typename promotion_trait<T1,T2>::promoted_type, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, j)) - 
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, j)) - 
                 static_cast<typename promotion_trait<T1,T2>::promoted_type>(B(i, j));
-		}
-	}
+        }
+    }
 
     return ret;
 }
@@ -248,11 +248,11 @@ operator- (const matrix_slice<T1,M,N,X,Y> &A, const matrix<T2,X,Y> &B)
     matrix<typename promotion_trait<T1,T2>::promoted_type, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, j)) - 
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, j)) - 
                 static_cast<typename promotion_trait<T1,T2>::promoted_type>(B(i, j));
-		}
-	}
+        }
+    }
 
     return ret;
 }
@@ -270,12 +270,12 @@ operator* (const matrix_slice<T,M,N,X,Y> &A, const matrix_slice<T,P,Q,Y,W> &B)
     matrix<T, X, W> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-   		for (std::size_t j = 0; j < W; ++j) {
-		    ret(i, j) = 0;
-		    for (std::size_t k = 0; k < Y; ++k) {
-   				ret(i, j) += A(i, k) * B(k, j);
-		    }
-	    }
+           for (std::size_t j = 0; j < W; ++j) {
+            ret(i, j) = 0;
+            for (std::size_t k = 0; k < Y; ++k) {
+                   ret(i, j) += A(i, k) * B(k, j);
+            }
+        }
     }
 
     return ret;
@@ -291,12 +291,12 @@ operator* (const matrix<T,X,Y> &A, const matrix_slice<T,P,Q,Y,W> &B)
     matrix<T, X, W> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-   		for (std::size_t j = 0; j < W; ++j) {
-		    ret(i, j) = 0;
-		    for (std::size_t k = 0; k < Y; ++k) {
-   				ret(i, j) += A(i, k) * B(k, j);
-		    }
-	    }
+           for (std::size_t j = 0; j < W; ++j) {
+            ret(i, j) = 0;
+            for (std::size_t k = 0; k < Y; ++k) {
+                   ret(i, j) += A(i, k) * B(k, j);
+            }
+        }
     }
 
     return ret;
@@ -311,12 +311,12 @@ operator* (const matrix_slice<T,M,N,X,Y> &A, const matrix<T,Y,W> &B)
     matrix<T, X, W> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-   		for (std::size_t j = 0; j < W; ++j) {
-		    ret(i, j) = 0;
-		    for (std::size_t k = 0; k < Y; ++k) {
-   				ret(i, j) += A(i, k) * B(k, j);
-		    }
-	    }
+           for (std::size_t j = 0; j < W; ++j) {
+            ret(i, j) = 0;
+            for (std::size_t k = 0; k < Y; ++k) {
+                   ret(i, j) += A(i, k) * B(k, j);
+            }
+        }
     }
 
     return ret;
@@ -330,13 +330,13 @@ operator* (const matrix_slice<T1,M,N,X,Y> &A, const matrix_slice<T2,P,Q,Y,W> &B)
     matrix<typename promotion_trait<T1,T2>::promoted_type, X, W> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-   		for (std::size_t j = 0; j < W; ++j) {
-		    ret(i, j) = 0;
-		    for (std::size_t k = 0; k < Y; ++k) {
-   				ret(i, j) += static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, k)) * 
+           for (std::size_t j = 0; j < W; ++j) {
+            ret(i, j) = 0;
+            for (std::size_t k = 0; k < Y; ++k) {
+                   ret(i, j) += static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, k)) * 
                     static_cast<typename promotion_trait<T1,T2>::promoted_type>(B(k, j));
-		    }
-	    }
+            }
+        }
     }
 
     return ret;
@@ -351,13 +351,13 @@ operator* (const matrix<T1,X,Y> &A, const matrix_slice<T2,P,Q,Y,W> &B)
     matrix<typename promotion_trait<T1,T2>::promoted_type, X, W> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-   		for (std::size_t j = 0; j < W; ++j) {
-		    ret(i, j) = 0;
-		    for (std::size_t k = 0; k < Y; ++k) {
-   				ret(i, j) += static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, k)) * 
+           for (std::size_t j = 0; j < W; ++j) {
+            ret(i, j) = 0;
+            for (std::size_t k = 0; k < Y; ++k) {
+                   ret(i, j) += static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, k)) * 
                     static_cast<typename promotion_trait<T1,T2>::promoted_type>(B(k, j));
-		    }
-	    }
+            }
+        }
     }
 
     return ret;
@@ -372,13 +372,13 @@ operator* (const matrix_slice<T1,M,N,X,Y> &A, const matrix<T2,Y,W> &B)
     matrix<typename promotion_trait<T1,T2>::promoted_type, X, W> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-   		for (std::size_t j = 0; j < W; ++j) {
-		    ret(i, j) = 0;
-		    for (std::size_t k = 0; k < Y; ++k) {
-   				ret(i, j) += static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, k)) * 
+           for (std::size_t j = 0; j < W; ++j) {
+            ret(i, j) = 0;
+            for (std::size_t k = 0; k < Y; ++k) {
+                   ret(i, j) += static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, k)) * 
                     static_cast<typename promotion_trait<T1,T2>::promoted_type>(B(k, j));
-		    }
-	    }
+            }
+        }
     }
 
     return ret;
@@ -397,10 +397,10 @@ operator* (const Ts &op1, const matrix_slice<Ts,M,N,X,Y> &op2)
     matrix<Ts, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = op1 * op2(i,j);
-		}
-	}
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = op1 * op2(i,j);
+        }
+    }
 
     return ret;
 }
@@ -414,10 +414,10 @@ operator* (const matrix_slice<Ts,M,N,X,Y> &op2, const Ts &op1)
     matrix<Ts, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = op1 * op2(i,j);
-		}
-	}
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = op1 * op2(i,j);
+        }
+    }
 
     return ret;
 }
@@ -431,11 +431,11 @@ operator* (const T1 &op1, const matrix_slice<T2,M,N,X,Y> &op2)
     matrix<typename promotion_trait<T1,T2>::promoted_type, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(op1) * 
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(op1) * 
                 static_cast<typename promotion_trait<T1,T2>::promoted_type>(op2(i,j));
-		}
-	}
+        }
+    }
 
     return ret;
 }
@@ -449,11 +449,11 @@ operator* (const matrix_slice<T2,M,N,X,Y> &op2, const T1 &op1)
     matrix<typename promotion_trait<T1,T2>::promoted_type, X, Y> ret;
 
     for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(op1) * 
+        for (std::size_t j = 0; j < Y; ++j) {
+            ret(i,j) = static_cast<typename promotion_trait<T1,T2>::promoted_type>(op1) * 
                 static_cast<typename promotion_trait<T1,T2>::promoted_type>(op2(i,j));
-		}
-	}
+        }
+    }
 
     return ret;
 }
@@ -471,8 +471,8 @@ operator<<(std::ostream& os, const matrix_slice<Ts,M,N,X,Y>& m)
     for(std::size_t i = 0; i < X; ++i) {
         for(std::size_t j = 0; j < Y; ++j) {
             os << m(i,j) << " ";
-	    }
-	    os << "\n";
+        }
+        os << "\n";
     }
 
     return os;

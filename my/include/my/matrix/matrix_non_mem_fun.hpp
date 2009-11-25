@@ -62,14 +62,14 @@ namespace my {
     {
         matrix<Ts, M, P> ret;
 
-	    for (std::size_t i = 0; i < M; ++i) {
-    		for (std::size_t j = 0; j < P; ++j) {
-			    ret(i, j) = 0;
-			    for (std::size_t k = 0; k < N; ++k) {
-    				ret(i, j) += A(i, k) * B(k, j);
-			    }
-		    }
-	    }
+        for (std::size_t i = 0; i < M; ++i) {
+            for (std::size_t j = 0; j < P; ++j) {
+                ret(i, j) = 0;
+                for (std::size_t k = 0; k < N; ++k) {
+                    ret(i, j) += A(i, k) * B(k, j);
+                }
+            }
+        }
 
         return ret;
     }
@@ -80,17 +80,17 @@ namespace my {
     const matrix<typename promotion_trait<T1,T2>::promoted_type, M, P> 
     operator* (const matrix<T1, M, N> &A, const matrix<T2, N, P> &B) 
     {
-    	matrix<typename promotion_trait<T1,T2>::promoted_type, M, P> ret;
+        matrix<typename promotion_trait<T1,T2>::promoted_type, M, P> ret;
     
-    	for (std::size_t i = 0; i < M; ++i) {
-		    for (std::size_t j = 0; j < P; ++j) {
-    			ret(i, j) = 0;
-			    for (std::size_t k = 0; k < N; ++k) {
-    				ret(i, j) += static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, k))
+        for (std::size_t i = 0; i < M; ++i) {
+            for (std::size_t j = 0; j < P; ++j) {
+                ret(i, j) = 0;
+                for (std::size_t k = 0; k < N; ++k) {
+                    ret(i, j) += static_cast<typename promotion_trait<T1,T2>::promoted_type>(A(i, k))
                         * static_cast<typename promotion_trait<T1,T2>::promoted_type>(B(k, j));
-			    }
-		    }
-	    }
+                }
+            }
+        }
 
         return ret;
     }
@@ -141,10 +141,10 @@ namespace my {
     matrix<Ts, M, M>
     diag(const vector<Ts, M>& v)
     {
-    	matrix<Ts, M, M> ret;
+        matrix<Ts, M, M> ret;
 
-    	for (size_t i = 0; i < M; ++i) {
-	        ret(i,i) = v(i);
+        for (size_t i = 0; i < M; ++i) {
+            ret(i,i) = v(i);
         }
 
         return ret;
@@ -157,13 +157,13 @@ namespace my {
     matrix<Ts, M, N>
     zeros()
     {
-    	matrix<Ts, M, N> ret;
-    	for (size_t i = 0; i < M; ++i) {
-		    for (size_t j = 0; j <N; ++j) {
-    			ret(i,j) = 0;
-		    }
-	    }
-	    return ret;
+        matrix<Ts, M, N> ret;
+        for (size_t i = 0; i < M; ++i) {
+            for (size_t j = 0; j <N; ++j) {
+                ret(i,j) = 0;
+            }
+        }
+        return ret;
     }
     */
 
@@ -173,13 +173,13 @@ namespace my {
     const matrix<Ts, M, N>&
     zeros(matrix<Ts, M, N>& m)
     {
-    	for (size_t i = 0; i < M; ++i) {
-		    for (size_t j = 0; j <N; ++j) {
-    			m(i,j) = 0;
-		    }
-	    }
+        for (size_t i = 0; i < M; ++i) {
+            for (size_t j = 0; j <N; ++j) {
+                m(i,j) = 0;
+            }
+        }
 
-	    return m;
+        return m;
     }
 
 
@@ -188,9 +188,9 @@ namespace my {
     matrix<Ts, M, N>
     eye() {
         matrix<Ts, M, N> ret;
-    	Ts t = M < N ? M : N;
+        Ts t = M < N ? M : N;
         for (size_t i = 0; i < t; ++i) {
-	        ret(i,i) = 1;
+            ret(i,i) = 1;
         }
 
         return ret;
@@ -203,7 +203,7 @@ namespace my {
     eye() {
         matrix<Ts, M, M> ret;
         for (size_t i = 0; i < M; ++i) {
-	        ret(i,i) = 1;
+            ret(i,i) = 1;
         }
 
         return ret;
@@ -215,12 +215,12 @@ namespace my {
     const matrix<Ts, M, N>&
     eye(matrix<Ts, M, N>& m)
     {
-    	for (size_t i = 0; i < M; ++i) {
-		    for (size_t j = 0; j <N; ++j) {
-    			(i==j) ? (m(i,j)=1) : (m(i,j)=0);
-		    }
-	    }
-	    return m;
+        for (size_t i = 0; i < M; ++i) {
+            for (size_t j = 0; j <N; ++j) {
+                (i==j) ? (m(i,j)=1) : (m(i,j)=0);
+            }
+        }
+        return m;
     }
 
 
@@ -230,10 +230,10 @@ namespace my {
     operator<<(std::ostream& os, const matrix<Ts, M, N>& m)
     {
         for(std::size_t i = 0; i < M; ++i) {
-		    for(std::size_t j = 0; j < N; ++j) {
+            for(std::size_t j = 0; j < N; ++j) {
             os << m(i,j) << " ";
-		    }
-		    os << "\n";
+            }
+            os << "\n";
         }
 
         return os;
@@ -246,7 +246,7 @@ namespace my {
     operator>>(std::istream& is, matrix<Ts, M, N>& m)
     {
         for(std::size_t i = 0; i < M; ++i) {
-		    for(std::size_t j = 0; j < N; ++j) {
+            for(std::size_t j = 0; j < N; ++j) {
                 is >> m(i,j);
             }
         }
