@@ -64,6 +64,10 @@ public:
     matrix(const matrix& copy); 
     template<typename U> matrix(const matrix<U, M, N>& copy); 
 
+    // construct from matrix_slice
+    template<std::size_t K, std::size_t L> matrix(const matrix_slice<Ts,K,L,M,N>& s);
+    template<typename U, std::size_t K, std::size_t L> matrix(const matrix_slice<U,K,L,M,N>& s);
+
     ~matrix();
 
     // index for mutator
@@ -77,22 +81,26 @@ public:
     template <std::size_t X, std::size_t Y> const matrix_slice<Ts, M, N, X, Y> operator() (const std::size_t (&row)[X], const std::size_t (&col)[Y]) const;
 
     matrix& operator= (const matrix &rhs);
-    template<typename U> matrix& operator= (const matrix<U, M, N>& rhs); // with coercion.
+    template<typename U> matrix& operator= (const matrix<U, M, N>& rhs);
+
+    // matrix = matrix_slice is not provided
+    // but works by way of implicit conversion of rhs to tmp matrix and assignment of lhs from tmp matrix
+    // this is inexpensive as matrix data are reference counted
 
 	// matrix& operator= (const Ts(&a)[M][N]);
-    // template<typename U> matrix& operator= (const U(&a)[M][N]); // with coercion.
+    // template<typename U> matrix& operator= (const U(&a)[M][N]);
 
 	// matrix& operator= (const vector<Ts, M>(&a)[N]);
-    // template<typename U> matrix& operator= (const vector<U, M>(&a)[N]); // with coercion.
+    // template<typename U> matrix& operator= (const vector<U, M>(&a)[N]);
 
     matrix& operator+= (const matrix &rhs);
-    template<typename U> matrix& operator+= (const matrix<U, M, N>& rhs); // with coercion.
+    template<typename U> matrix& operator+= (const matrix<U, M, N>& rhs);
 
     matrix& operator-= (const matrix &rhs);
-    template<typename U> matrix& operator-= (const matrix<U, M, N>& rhs); // with coercion.
+    template<typename U> matrix& operator-= (const matrix<U, M, N>& rhs);
 
     matrix& operator *= (const Ts &rhs);
-    template<typename U> matrix& operator*= (const U& rhs); // with coercion.
+    template<typename U> matrix& operator*= (const U& rhs);
 
     const matrix& operator+() const; // unary operator "+" (do nothing)
     const matrix operator-() const; // unary operator "-" (negation)
@@ -170,7 +178,7 @@ matrix<Ts, M, N>::matrix(const vector<Ts, M>(&a)[N]) // array of column vectors
 
 template <typename Ts, const std::size_t M, const std::size_t N>
 template<typename U> 
-matrix<Ts, M, N>::matrix(const vector<U, M>(&a)[N]) // array of column vectors, with coercion
+matrix<Ts, M, N>::matrix(const vector<U, M>(&a)[N]) // array of column vectors
 {
     count_ = new int(1);
 	data_ = new Ts[M*N];
@@ -189,10 +197,6 @@ matrix<Ts, M, N>::matrix(const vector<Ts, N>(&a)[M], bool dummy) // array of row
     count_ = new int(1);
 	data_ = new Ts[M*N];
 	for (std::size_t i = 0; i < M; ++i) { // row
-
-        // if matrix<Ts, M, N> is friend of vector<Ts, N>
-        // memcpy(data_ + i * N, a[i], sizeof(Ts) * N);
-
 		for (std::size_t j = 0; j < N; ++j) { // column
 			data_[i * N + j] = a[i](j);
 		}
@@ -203,7 +207,7 @@ matrix<Ts, M, N>::matrix(const vector<Ts, N>(&a)[M], bool dummy) // array of row
 
 template <typename Ts, const std::size_t M, const std::size_t N>
 template<typename U> 
-matrix<Ts, M, N>::matrix(const vector<U, N>(&a)[M], bool dummy) // array of row vectors, with coercion
+matrix<Ts, M, N>::matrix(const vector<U, N>(&a)[M], bool dummy) // array of row vectors
 {
     count_ = new int(1);
 	data_ = new Ts[M*N];
@@ -221,14 +225,12 @@ matrix<Ts, M, N>::matrix(const matrix<Ts, M, N>& copy) // copy constructor
 : count_(copy.count_), data_(copy.data_)
 {
     ++*count_;
-    // data_ = new Ts[M*N];
-    // memcpy(data_, copy.data_, sizeof(Ts) * M * N);
 }
 
 
 template <typename Ts, const std::size_t M, const std::size_t N>
 template<typename U> 
-matrix<Ts, M, N>::matrix(const matrix<U, M, N>& copy) // copy constructor, with coercion
+matrix<Ts, M, N>::matrix(const matrix<U, M, N>& copy) // copy constructor
 {
     count_ = new int(1);
     data_ = new Ts[M*N];
@@ -237,6 +239,34 @@ matrix<Ts, M, N>::matrix(const matrix<U, M, N>& copy) // copy constructor, with 
 			data_[i * N + j] = static_cast<Ts>(copy(i, j));
 		}
 	}    
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N>
+template<std::size_t K, std::size_t L>
+matrix<Ts, M, N>:: matrix(const matrix_slice<Ts,K,L,M,N>& s) // construct from matrix_slice
+{
+    count_ = new int(1);
+    data_ = new Ts[M*N];
+	for (std::size_t i = 0; i < M; ++i) {
+		for (std::size_t j = 0; j < N; ++j) {
+			data_[i * N + j] = s(i, j);
+		}
+	}
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N>
+template<typename U, std::size_t K, std::size_t L>
+matrix<Ts, M, N>:: matrix(const matrix_slice<U,K,L,M,N>& s) // construct from matrix_slice
+{
+    count_ = new int(1);
+    data_ = new Ts[M*N];
+	for (std::size_t i = 0; i < M; ++i) {
+		for (std::size_t j = 0; j < N; ++j) {
+			data_[i * N + j] = static_cast<Ts>(s(i, j));
+		}
+	}
 }
 
 
@@ -334,7 +364,7 @@ matrix<Ts, M, N>:: operator= (const matrix<Ts, M, N> &rhs)  // assignment operat
 template <typename Ts, const std::size_t M, const std::size_t N>
 template<typename U> 
 matrix<Ts, M, N>& 
-matrix<Ts, M, N>:: operator= (const matrix<U, M, N> &rhs) // assignment, with coercion
+matrix<Ts, M, N>:: operator= (const matrix<U, M, N> &rhs) // assignment
 {
 	for (std::size_t i = 0; i < M; ++i) {
 		for (std::size_t j = 0; j < N; ++j) {
@@ -363,7 +393,7 @@ matrix<Ts, M, N>:: operator+= (const matrix<Ts, M, N> &rhs)
 template <typename Ts, const std::size_t M, const std::size_t N>
 template<typename U> 
 matrix<Ts, M, N>& 
-matrix<Ts, M, N>:: operator+= (const matrix<U, M, N>& rhs) // with coercion.
+matrix<Ts, M, N>:: operator+= (const matrix<U, M, N>& rhs)
 {
 	for (std::size_t i = 0; i < M; ++i) {
 		for (std::size_t j = 0; j < N; ++j) {
@@ -392,7 +422,7 @@ matrix<Ts, M, N>:: operator-= (const matrix<Ts, M, N> &rhs)
 template <typename Ts, const std::size_t M, const std::size_t N>
 template<typename U> 
 matrix<Ts, M, N>& 
-matrix<Ts, M, N>:: operator-= (const matrix<U, M, N>& rhs) // with coercion.
+matrix<Ts, M, N>:: operator-= (const matrix<U, M, N>& rhs)
 {
 	for (std::size_t i = 0; i < M; ++i) {
 		for (std::size_t j = 0; j < N; ++j) {

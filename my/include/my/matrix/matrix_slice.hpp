@@ -54,16 +54,36 @@ public:
     const Ts& operator() (const std::size_t i, const std::size_t j) const; // index for inspector
 
     matrix_slice& operator= (const matrix<Ts,X,Y> &rhs); // assignment: change matrix<Ts,M,N> mat *in place*
-    template<typename U> matrix_slice& operator= (const matrix<U,X,Y>& rhs); // with coercion.
+    template<typename U> matrix_slice& operator= (const matrix<U,X,Y>& rhs);
+
+    // matrix_slice = matrix_slice is provided
+    // as implicit conversion of rhs to tmp matrix and assignment of lhs from tmp matrix is expensive
+    template <std::size_t P, std::size_t Q> matrix_slice& operator= (const matrix_slice<Ts,P,Q,X,Y> &rhs);
+    template <typename U, std::size_t P, std::size_t Q> matrix_slice& operator= (const matrix_slice<U,P,Q,X,Y> &rhs);
+
+    matrix_slice& operator= (const matrix_slice &rhs);
+    template<typename U> matrix_slice& operator= (const matrix_slice<U,M,N,X,Y>& rhs);
 
     matrix_slice& operator+= (const matrix<Ts,X,Y> &rhs);
-    template<typename U> matrix_slice& operator+= (const matrix<U,X,Y>& rhs); // with coercion.
+    template<typename U> matrix_slice& operator+= (const matrix<U,X,Y>& rhs);
+
+    template <std::size_t P, std::size_t Q> matrix_slice& operator+= (const matrix_slice<Ts,P,Q,X,Y> &rhs);
+    template <typename U, std::size_t P, std::size_t Q> matrix_slice& operator+= (const matrix_slice<U,P,Q,X,Y> &rhs);
+
+    matrix_slice& operator+= (const matrix_slice &rhs);
+    template<typename U> matrix_slice& operator+= (const matrix_slice<U,M,N,X,Y>& rhs);
 
     matrix_slice& operator-= (const matrix<Ts,X,Y> &rhs);
-    template<typename U> matrix_slice& operator-= (const matrix<U,X,Y>& rhs); // with coercion.
+    template<typename U> matrix_slice& operator-= (const matrix<U,X,Y>& rhs);
+
+    template <std::size_t P, std::size_t Q> matrix_slice& operator-= (const matrix_slice<Ts,P,Q,X,Y> &rhs);
+    template <typename U, std::size_t P, std::size_t Q> matrix_slice& operator-= (const matrix_slice<U,P,Q,X,Y> &rhs);
+
+    matrix_slice& operator-= (const matrix_slice &rhs);
+    template<typename U> matrix_slice& operator-= (const matrix_slice<U,M,N,X,Y>& rhs);
 
     matrix_slice& operator *= (const Ts &rhs);
-    template<typename U> matrix_slice& operator*= (const U& rhs); // with coercion.
+    template<typename U> matrix_slice& operator*= (const U& rhs);
 
     const matrix<Ts, X, Y> operator+() const; // unary operator "+"
     const matrix<Ts, X, Y> operator-() const; // unary operator "-"
@@ -84,8 +104,8 @@ matrix_slice<Ts,M,N,X,Y>:: matrix_slice (matrix<Ts,M,N>&mat, const std::size_t (
 : mat_(mat)
 {
 #if defined(DEBUG)
-    for (std::size_t i = 0; i < M; ++i) row_index_[i] = ((std::size_t)-1);
-    for (std::size_t i = 0; i < N; ++i) col_index_[i] = ((std::size_t)-1);
+    for (std::size_t i = 0; i < M; ++i) row_offset_[i] = ((std::size_t)-1);
+    for (std::size_t i = 0; i < N; ++i) col_offset_[i] = ((std::size_t)-1);
 #endif
     for (std::size_t i = 0; i < M && i < X; ++i) {
         row_index_[i] = row[i];
@@ -128,9 +148,28 @@ template <typename Ts, const std::size_t M, const std::size_t N, const std::size
 matrix_slice<Ts,M,N,X,Y>&
 matrix_slice<Ts,M,N,X,Y>:: operator= (const matrix<Ts, X, Y> &rhs)  // assignment operator
 {
+    if (&mat_ == &rhs) { // aliasing
+        matrix<Ts, X, Y> tmp(rhs);
+        *this = tmp;
+    } else {
+	    for (std::size_t i = 0; i < X; ++i) {
+		    for (std::size_t j = 0; j < Y; ++j) {
+			    (*this)(i,j) = rhs(i, j);
+		    }
+	    }
+    }
+    return *this;
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
+template<typename U> 
+matrix_slice<Ts,M,N,X,Y>&
+matrix_slice<Ts,M,N,X,Y>:: operator= (const matrix<U, X, Y> &rhs) // assignment
+{
 	for (std::size_t i = 0; i < X; ++i) {
 		for (std::size_t j = 0; j < Y; ++j) {
-			(*this)(i,j) = rhs(i, j); // data_[row_offset_[i] + col_offset_[j]] = rhs(i, j);
+			(*this)(i,j) = static_cast<Ts>(rhs(i, j));
 		}
 	}
 
@@ -139,19 +178,68 @@ matrix_slice<Ts,M,N,X,Y>:: operator= (const matrix<Ts, X, Y> &rhs)  // assignmen
 
 
 template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
-template<typename U> 
+template <std::size_t P, std::size_t Q>
 matrix_slice<Ts,M,N,X,Y>&
-matrix_slice<Ts,M,N,X,Y>:: operator= (const matrix<U, X, Y> &rhs) // assignment, with coercion
+matrix_slice<Ts,M,N,X,Y>:: operator= (const matrix_slice<Ts,P,Q,X,Y> &rhs) // assignment from matrix_slice
 {
-	for (std::size_t i = 0; i < X; ++i) {
-		for (std::size_t j = 0; j < Y; ++j) {
-			(*this)(i,j) = static_cast<Ts>(rhs(i, j)); // data_[row_offset_[i] + col_offset_[j]] = static_cast<Ts>(rhs(i, j));
-		}
-	}
-
+    if (&mat_ == &rhs.mat_) { // aliasing
+        matrix<Ts,X,Y> tmp(rhs);
+        *this = tmp;
+    } else {
+	    for (std::size_t i = 0; i < X; ++i) {
+		    for (std::size_t j = 0; j < Y; ++j) {
+			    (*this)(i,j) = rhs(i, j);
+		    }
+	    }
+    }
     return *this;
 }
 
+
+template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
+template <typename U, std::size_t P, std::size_t Q>
+matrix_slice<Ts,M,N,X,Y>&
+matrix_slice<Ts,M,N,X,Y>:: operator= (const matrix_slice<U,P,Q,X,Y> &rhs) // assignment from matrix_slice
+{
+    for (std::size_t i = 0; i < X; ++i) {
+	    for (std::size_t j = 0; j < Y; ++j) {
+		    (*this)(i,j) = static_cast<Ts>(rhs(i, j));
+	    }
+    }
+    return *this;
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
+matrix_slice<Ts,M,N,X,Y>&
+matrix_slice<Ts,M,N,X,Y>:: operator= (const matrix_slice<Ts,M,N,X,Y> &rhs) // assignment from matrix_slice
+{
+    if (&mat_ == &rhs.mat_) { // aliasing
+        matrix<Ts,X,Y> tmp(rhs);
+        *this = tmp;
+    } else {
+	    for (std::size_t i = 0; i < X; ++i) {
+		    for (std::size_t j = 0; j < Y; ++j) {
+			    (*this)(i,j) = rhs(i, j);
+		    }
+	    }
+    }
+    return *this;
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
+template <typename U>
+matrix_slice<Ts,M,N,X,Y>&
+matrix_slice<Ts,M,N,X,Y>:: operator= (const matrix_slice<U,M,N,X,Y> &rhs) // assignment from matrix_slice
+{
+    for (std::size_t i = 0; i < X; ++i) {
+	    for (std::size_t j = 0; j < Y; ++j) {
+		    (*this)(i,j) = static_cast<Ts>(rhs(i, j));
+	    }
+    }
+    return *this;
+}
 
 
 template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
@@ -160,7 +248,7 @@ matrix_slice<Ts,M,N,X,Y>:: operator+= (const matrix<Ts, X, Y> &rhs)
 {
 	for (std::size_t i = 0; i < X; ++i) {
 		for (std::size_t j = 0; j < Y; ++j) {
-			(*this)(i,j) += rhs(i, j); // data_[row_offset_[i] + col_offset_[j]] += rhs(i, j);
+			(*this)(i,j) += rhs(i, j);
 		}
 	}
 
@@ -171,14 +259,79 @@ matrix_slice<Ts,M,N,X,Y>:: operator+= (const matrix<Ts, X, Y> &rhs)
 template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
 template<typename U> 
 matrix_slice<Ts,M,N,X,Y>&
-matrix_slice<Ts,M,N,X,Y>:: operator+= (const matrix<U, X, Y> &rhs) // with coercion.
+matrix_slice<Ts,M,N,X,Y>:: operator+= (const matrix<U, X, Y> &rhs)
 {
 	for (std::size_t i = 0; i < X; ++i) {
 		for (std::size_t j = 0; j < Y; ++j) {
-			(*this)(i,j) += static_cast<Ts>(rhs(i, j)); // data_[row_offset_[i] + col_offset_[j]] += static_cast<Ts>(rhs(i, j));
+			(*this)(i,j) += static_cast<Ts>(rhs(i, j));
 		}
 	}
 
+    return *this;
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
+template <std::size_t P, std::size_t Q>
+matrix_slice<Ts,M,N,X,Y>&
+matrix_slice<Ts,M,N,X,Y>:: operator+= (const matrix_slice<Ts,P,Q,X,Y> &rhs)
+{
+    if (&mat_ == &rhs.mat_) { // aliasing
+        matrix<Ts,X,Y> tmp(rhs);
+        *this += tmp;
+    } else {
+	    for (std::size_t i = 0; i < X; ++i) {
+		    for (std::size_t j = 0; j < Y; ++j) {
+			    (*this)(i,j) += rhs(i, j);
+		    }
+	    }
+    }
+    return *this;
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
+template <typename U, std::size_t P, std::size_t Q>
+matrix_slice<Ts,M,N,X,Y>&
+matrix_slice<Ts,M,N,X,Y>:: operator+= (const matrix_slice<U,P,Q,X,Y> &rhs)
+{
+    for (std::size_t i = 0; i < X; ++i) {
+	    for (std::size_t j = 0; j < Y; ++j) {
+		    (*this)(i,j) += static_cast<Ts>(rhs(i, j));
+	    }
+    }
+    return *this;
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
+matrix_slice<Ts,M,N,X,Y>&
+matrix_slice<Ts,M,N,X,Y>:: operator+= (const matrix_slice<Ts,M,N,X,Y> &rhs)
+{
+    if (&mat_ == &rhs.mat_) { // aliasing
+        matrix<Ts,X,Y> tmp(rhs);
+        *this += tmp;
+    } else {
+	    for (std::size_t i = 0; i < X; ++i) {
+		    for (std::size_t j = 0; j < Y; ++j) {
+			    (*this)(i,j) += rhs(i, j);
+		    }
+	    }
+    }
+    return *this;
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
+template <typename U>
+matrix_slice<Ts,M,N,X,Y>&
+matrix_slice<Ts,M,N,X,Y>:: operator+= (const matrix_slice<U,M,N,X,Y> &rhs)
+{
+    for (std::size_t i = 0; i < X; ++i) {
+	    for (std::size_t j = 0; j < Y; ++j) {
+		    (*this)(i,j) += static_cast<Ts>(rhs(i, j));
+	    }
+    }
     return *this;
 }
 
@@ -189,7 +342,7 @@ matrix_slice<Ts,M,N,X,Y>:: operator-= (const matrix<Ts, X, Y> &rhs)
 {
 	for (std::size_t i = 0; i < X; ++i) {
 		for (std::size_t j = 0; j < Y; ++j) {
-			(*this)(i,j) -= rhs(i, j); // data_[row_offset_[i] + col_offset_[j]] -= rhs(i, j);
+			(*this)(i,j) -= rhs(i, j);
 		}
 	}
 
@@ -200,14 +353,79 @@ matrix_slice<Ts,M,N,X,Y>:: operator-= (const matrix<Ts, X, Y> &rhs)
 template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
 template<typename U> 
 matrix_slice<Ts,M,N,X,Y>&
-matrix_slice<Ts,M,N,X,Y>:: operator-= (const matrix<U, X, Y> &rhs) // with coercion.
+matrix_slice<Ts,M,N,X,Y>:: operator-= (const matrix<U, X, Y> &rhs)
 {
 	for (std::size_t i = 0; i < X; ++i) {
 		for (std::size_t j = 0; j < Y; ++j) {
-			(*this)(i,j) -= static_cast<Ts>(rhs(i, j)); // data_[row_offset_[i] + col_offset_[j]] -= static_cast<Ts>(rhs(i, j));
+			(*this)(i,j) -= static_cast<Ts>(rhs(i, j));
 		}
 	}
 
+    return *this;
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
+template <std::size_t P, std::size_t Q>
+matrix_slice<Ts,M,N,X,Y>&
+matrix_slice<Ts,M,N,X,Y>:: operator-= (const matrix_slice<Ts,P,Q,X,Y> &rhs)
+{
+    if (&mat_ == &rhs.mat_) { // aliasing
+        matrix<Ts,X,Y> tmp(rhs);
+        *this -= tmp;
+    } else {
+	    for (std::size_t i = 0; i < X; ++i) {
+		    for (std::size_t j = 0; j < Y; ++j) {
+			    (*this)(i,j) -= rhs(i, j);
+		    }
+	    }
+    }
+    return *this;
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
+template <typename U, std::size_t P, std::size_t Q>
+matrix_slice<Ts,M,N,X,Y>&
+matrix_slice<Ts,M,N,X,Y>:: operator-= (const matrix_slice<U,P,Q,X,Y> &rhs)
+{
+    for (std::size_t i = 0; i < X; ++i) {
+	    for (std::size_t j = 0; j < Y; ++j) {
+		    (*this)(i,j) -= static_cast<Ts>(rhs(i, j));
+	    }
+    }
+    return *this;
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
+matrix_slice<Ts,M,N,X,Y>&
+matrix_slice<Ts,M,N,X,Y>:: operator-= (const matrix_slice<Ts,M,N,X,Y> &rhs)
+{
+    if (&mat_ == &rhs.mat_) { // aliasing
+        matrix<Ts,X,Y> tmp(rhs);
+        *this -= tmp;
+    } else {
+	    for (std::size_t i = 0; i < X; ++i) {
+		    for (std::size_t j = 0; j < Y; ++j) {
+			    (*this)(i,j) -= rhs(i, j);
+		    }
+	    }
+    }
+    return *this;
+}
+
+
+template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
+template <typename U>
+matrix_slice<Ts,M,N,X,Y>&
+matrix_slice<Ts,M,N,X,Y>:: operator-= (const matrix_slice<U,M,N,X,Y> &rhs)
+{
+    for (std::size_t i = 0; i < X; ++i) {
+	    for (std::size_t j = 0; j < Y; ++j) {
+		    (*this)(i,j) -= static_cast<Ts>(rhs(i, j));
+	    }
+    }
     return *this;
 }
 
@@ -218,7 +436,7 @@ matrix_slice<Ts,M,N,X,Y>:: operator*= (const Ts &rhs)
 {
 	for (std::size_t i = 0; i < X; ++i) {
 		for (std::size_t j = 0; j < Y; ++j) {
-			(*this)(i,j) *= rhs; // data_[row_offset_[i] + col_offset_[j]] *= rhs;
+			(*this)(i,j) *= rhs;
 		}
 	}
 
@@ -229,7 +447,7 @@ matrix_slice<Ts,M,N,X,Y>:: operator*= (const Ts &rhs)
 template <typename Ts, const std::size_t M, const std::size_t N, const std::size_t X, const std::size_t Y>
 template<typename U> 
 matrix_slice<Ts,M,N,X,Y>&
-matrix_slice<Ts,M,N,X,Y>:: operator*= (const U &rhs) // with coercion.
+matrix_slice<Ts,M,N,X,Y>:: operator*= (const U &rhs)
 {
     (*this) *= static_cast<Ts>(rhs);
     return *this;
