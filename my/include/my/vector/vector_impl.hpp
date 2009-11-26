@@ -39,6 +39,7 @@ class vector
 public:
 
     typedef Ts scalar_type;
+    typedef const Ts(&ref_array_type)[N];
 
     static const std::size_t dim = N;
 
@@ -54,17 +55,19 @@ public:
     Ts& operator() (const std::size_t index);
     const Ts& operator() (const std::size_t index) const;
 
+    operator ref_array_type () const; // user-defined conversion
+
     vector& operator= (const vector &rhs);
-    template<typename U> vector& operator= (const vector<U, N> &rhs); // with coercion.
+    template<typename U> vector& operator= (const vector<U, N> &rhs);
 
     vector& operator+= (const vector &rhs);
-    template<typename U> vector& operator+= (const vector<U, N> &rhs); // with coercion.
+    template<typename U> vector& operator+= (const vector<U, N> &rhs);
 
     vector& operator-= (const vector &rhs);
-    template<typename U> vector& operator-= (const vector<U, N> &rhs); // with coercion.
+    template<typename U> vector& operator-= (const vector<U, N> &rhs);
 
     vector& operator *= (const Ts &rhs);
-    template<typename U> vector& operator*= (const U &rhs); // with coercion.
+    template<typename U> vector& operator*= (const U &rhs);
 
     const vector& operator+() const; // unary operator "+" (do nothing)
     const vector operator-() const; // unary operator "-" (negation)
@@ -179,6 +182,18 @@ vector<Ts, N>:: operator() (const std::size_t index) const // index for inspecto
 
     return data_[index];
 
+}
+
+
+// user-defined conversion (for matrix index slicing)
+// since function cannot return array in C++,
+// a vector<std::size_t,N> returned by seq gets converted to std::size_t(&)[N],
+// and passed to matrix_slice constructor.
+// when matrix_slice is constructed, data_ stays in scope.
+template <typename Ts, const std::size_t N>
+vector<Ts, N>:: operator typename vector<Ts, N>::ref_array_type () const
+{
+    return reinterpret_cast<const Ts(&)[N]>(*data_);
 }
 
 

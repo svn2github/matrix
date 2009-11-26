@@ -22,7 +22,9 @@ void foo(T(&a)[M][N])
     // is for testing purpose only
     // use 'matrix-name(row-indices, col-indices)' for client code
     my::matrix_slice<T,M,N,countof(s),countof(t)> ms(m, s, t);
-    my::matrix_slice<T,M,N,countof(u),countof(v)> ms1(m, u, v);
+    my::matrix_slice<T,M,N,countof(u),countof(v)> ms1(m, u, my_range(0,3,1));
+
+    std::cout << my_range(0,10,1) << std::endl;
 
     std::cout << " m = \n" << m << std::endl;
     std::cout << " ms = \n" << ms << std::endl;

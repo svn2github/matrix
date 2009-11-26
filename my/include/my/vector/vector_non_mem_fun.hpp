@@ -108,22 +108,22 @@ operator* (const typename my::vector<T2, N> &op2, const T1 &op1)
     }
 
 
-    //////// //////// //////// //////// //////// //////// ////////
-    // vector * vector with type promotion, not a member function
-    //////// //////// //////// //////// //////// //////// ////////
-    template <typename T1, typename T2, const std::size_t N>
-    const typename my::promotion_trait<T1,T2>::promoted_type
-    operator* (const typename my::vector<T1, N> &op1, const typename my::vector<T2, N> &op2)
-    {
-        typename my::promotion_trait<T1,T2>::promoted_type ret(0);
-        for (size_t i = 0; i < N; ++i) {
-            // static_cast<> is needed for template argument deduction
-            ret += static_cast<typename my::promotion_trait<T1,T2>::promoted_type>(op1(i)) * 
-                static_cast<typename my::promotion_trait<T1,T2>::promoted_type>(op2(i));
-        }
-    
-        return ret;
+//////// //////// //////// //////// //////// //////// ////////
+// vector * vector with type promotion, not a member function
+//////// //////// //////// //////// //////// //////// ////////
+template <typename T1, typename T2, const std::size_t N>
+const typename my::promotion_trait<T1,T2>::promoted_type
+operator* (const typename my::vector<T1, N> &op1, const typename my::vector<T2, N> &op2)
+{
+    typename my::promotion_trait<T1,T2>::promoted_type ret(0);
+    for (size_t i = 0; i < N; ++i) {
+        // static_cast<> is needed for template argument deduction
+        ret += static_cast<typename my::promotion_trait<T1,T2>::promoted_type>(op1(i)) *
+            static_cast<typename my::promotion_trait<T1,T2>::promoted_type>(op2(i));
     }
+
+    return ret;
+}
 
 
 template <typename T, std::size_t N>
@@ -148,6 +148,19 @@ operator>>(istream& is, typename my::vector<T, N>& v)
 
     return is;
 }
+
+
+// helper function for matrix index slicing
+template<typename Ts, std::size_t I, std::size_t F, std::ptrdiff_t H>
+vector<Ts,(F-I)/H>
+seq()
+{
+    vector<Ts,(F-I)/H> ret;
+    for (std::size_t idx=0, val=I; idx < (F-I)/H; ++idx, val += H) ret(idx) = val;
+    return ret;
+}
+
+#define my_range(from,to,step) my::seq<std::size_t, static_cast<std::size_t>(from), static_cast<std::size_t>(to), static_cast<std::size_t>(step)>()
 
 
 } // namespace

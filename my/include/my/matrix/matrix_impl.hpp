@@ -52,11 +52,11 @@ public:
     matrix(const Ts(&a)[M][N]); 
     template<typename U> matrix(const U(&a)[M][N]);
 
-    // construct from an array of column vectors
+    // construct from an array of column vectors, deprecated
     matrix(const vector<Ts, M>(&a)[N]); 
     template<typename U> matrix(const vector<U, M>(&a)[N]);
 
-    // construct from an array of row vectors
+    // construct from an array of row vectors, deprecated
     matrix(const vector<Ts, N>(&a)[M], bool dummy); 
     template<typename U> matrix(const vector<U, N>(&a)[M], bool dummy);
 

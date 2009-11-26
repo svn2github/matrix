@@ -18,9 +18,8 @@ void foo(S(&a)[M][N], T t, U u)
     my::matrix<U,N,M> n( (const S(&)[N][M]) a[0][0] );
     my::matrix<T,N,M> q(n);
 
-    // support for assignment from array types is removed 
-    // p = (const S(&)[M][N]) a[0][0];
-    // q = (const S(&)[N][M]) a[0][0];
+    p = (const S(&)[M][N]) a[0][0];
+    q = (const S(&)[N][M]) a[0][0];
 
     std::cout << " p = \n" << p << std::endl;
     std::cout << " q = \n" << q << std::endl;
@@ -92,10 +91,14 @@ my::matrix<Ts,M,1> y((const Ts(&)[M][1])b[0]);
 my::matrix<Ts,M,1> z((const my::vector<Ts,3>(&)[1])u);
 my::matrix<Ts,1,M> w((const my::vector<Ts,3>(&)[1])u, 1);
 
+my::matrix<Ts,M,M> d = my::diag(b);
+d = my::diag<Ts,M>(u);
+
 std::cout << x << std::endl;
 std::cout << y << std::endl;
 std::cout << z << std::endl;
 std::cout << w << std::endl;
+std::cout << d << std::endl;
 
 std::cout << x * y << std::endl;
 std::cout << my::row_vector(u) * my::col_vector(u) << std::endl;

@@ -136,36 +136,19 @@ namespace my {
     }
 
 
-    // construct a diagonal matrix from a vector
+    // construct a diagonal matrix from an array
     template <typename Ts, size_t M>
     matrix<Ts, M, M>
-    diag(const vector<Ts, M>& v)
+    diag(const Ts(&a)[M])
     {
         matrix<Ts, M, M> ret;
 
         for (size_t i = 0; i < M; ++i) {
-            ret(i,i) = v(i);
+            ret(i,i) = a[i];
         }
 
         return ret;
     }
-
-
-    /*
-    // return an MxN zero matrix
-    template <typename Ts, size_t M, size_t N>
-    matrix<Ts, M, N>
-    zeros()
-    {
-        matrix<Ts, M, N> ret;
-        for (size_t i = 0; i < M; ++i) {
-            for (size_t j = 0; j <N; ++j) {
-                ret(i,j) = 0;
-            }
-        }
-        return ret;
-    }
-    */
 
 
     // reset a matrix to the zero matrix
