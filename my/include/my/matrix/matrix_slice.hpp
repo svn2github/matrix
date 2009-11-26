@@ -148,7 +148,7 @@ template <typename Ts, const std::size_t M, const std::size_t N, const std::size
 matrix_slice<Ts,M,N,X,Y>&
 matrix_slice<Ts,M,N,X,Y>:: operator= (const matrix<Ts, X, Y> &rhs)  // assignment operator
 {
-    if (&mat_ == &rhs) { // aliasing
+    if (static_cast<void*>(&mat_) == &rhs) { // aliasing
         matrix<Ts, X, Y> tmp(rhs);
         *this = tmp;
     } else {
@@ -182,7 +182,7 @@ template <std::size_t P, std::size_t Q>
 matrix_slice<Ts,M,N,X,Y>&
 matrix_slice<Ts,M,N,X,Y>:: operator= (const matrix_slice<Ts,P,Q,X,Y> &rhs) // assignment from matrix_slice
 {
-    if (&mat_ == &rhs.mat_) { // aliasing
+    if (static_cast<void*>(&mat_) == &rhs.mat_) { // aliasing
         matrix<Ts,X,Y> tmp(rhs);
         *this = tmp;
     } else {
@@ -214,7 +214,7 @@ template <typename Ts, const std::size_t M, const std::size_t N, const std::size
 matrix_slice<Ts,M,N,X,Y>&
 matrix_slice<Ts,M,N,X,Y>:: operator= (const matrix_slice<Ts,M,N,X,Y> &rhs) // assignment from matrix_slice
 {
-    if (&mat_ == &rhs.mat_) { // aliasing
+    if (static_cast<void*>(&mat_) == &rhs.mat_) { // aliasing
         matrix<Ts,X,Y> tmp(rhs);
         *this = tmp;
     } else {
@@ -276,7 +276,7 @@ template <std::size_t P, std::size_t Q>
 matrix_slice<Ts,M,N,X,Y>&
 matrix_slice<Ts,M,N,X,Y>:: operator+= (const matrix_slice<Ts,P,Q,X,Y> &rhs)
 {
-    if (&mat_ == &rhs.mat_) { // aliasing
+    if (static_cast<void*>(&mat_) == &rhs.mat_) { // aliasing
         matrix<Ts,X,Y> tmp(rhs);
         *this += tmp;
     } else {
@@ -308,7 +308,7 @@ template <typename Ts, const std::size_t M, const std::size_t N, const std::size
 matrix_slice<Ts,M,N,X,Y>&
 matrix_slice<Ts,M,N,X,Y>:: operator+= (const matrix_slice<Ts,M,N,X,Y> &rhs)
 {
-    if (&mat_ == &rhs.mat_) { // aliasing
+    if (static_cast<void*>(&mat_) == &rhs.mat_) { // aliasing
         matrix<Ts,X,Y> tmp(rhs);
         *this += tmp;
     } else {
@@ -370,7 +370,7 @@ template <std::size_t P, std::size_t Q>
 matrix_slice<Ts,M,N,X,Y>&
 matrix_slice<Ts,M,N,X,Y>:: operator-= (const matrix_slice<Ts,P,Q,X,Y> &rhs)
 {
-    if (&mat_ == &rhs.mat_) { // aliasing
+    if (static_cast<void*>(&mat_) == &rhs.mat_) { // aliasing
         matrix<Ts,X,Y> tmp(rhs);
         *this -= tmp;
     } else {
@@ -402,7 +402,7 @@ template <typename Ts, const std::size_t M, const std::size_t N, const std::size
 matrix_slice<Ts,M,N,X,Y>&
 matrix_slice<Ts,M,N,X,Y>:: operator-= (const matrix_slice<Ts,M,N,X,Y> &rhs)
 {
-    if (&mat_ == &rhs.mat_) { // aliasing
+    if (static_cast<void*>(&mat_) == &rhs.mat_) { // aliasing
         matrix<Ts,X,Y> tmp(rhs);
         *this -= tmp;
     } else {
