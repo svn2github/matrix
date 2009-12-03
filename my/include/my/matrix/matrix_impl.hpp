@@ -112,11 +112,10 @@ public:
     // subtraction with type promotion is factored out
     // matrix multiplication is not a member function
 
-    const Ts norm() const; // Frobenius norm (for computational simplicity)
     const matrix<Ts, N, M> T() const; // transpose
 
     // hermitian and conjugacy are derived from matrix_base<Ts, M, N, real_trait<Ts>::is_real>
-    // no virtual function table is needed.
+    // so is it with Frobenius norm (for computational simplicity).
 
     template <typename U, const std::size_t P, const std::size_t Q, const std::size_t X, const std::size_t Y> friend class matrix_slice;
 
@@ -490,21 +489,6 @@ matrix<Ts, M, N>:: operator- (const matrix<Ts, M, N> &other) const
 {
     matrix<Ts, M, N> ret(*this);
     return (ret -= other);
-}
-
-
-// Frobenius norm
-template <typename Ts, const std::size_t M, const std::size_t N>
-const Ts
-matrix<Ts, M, N>::norm() const 
-{
-    Ts ret(0);
-
-    for (Ts* it = data_; it < data_ + M * N; ++it) {
-        ret += (*it) * (*it);
-    }
-
-    return sqrt(ret);
 }
 
 

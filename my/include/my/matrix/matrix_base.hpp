@@ -40,6 +40,7 @@ namespace my {
 
         const matrix<Ts, N, M> H() const; // hermitian (conjugate transpose)
         const matrix<Ts, M, N> conj() const; // conjugate
+        const Ts norm() const; // Frobenius norm
     };
 
     // specialization for real matrices
@@ -49,6 +50,7 @@ namespace my {
     public:
         const matrix<Ts, N, M> H() const; // hermitian (conjugate transpose)
         const matrix<Ts, M, N> conj() const; // conjugate
+        const Ts norm() const; // Frobenius norm
     };
 
 
@@ -59,6 +61,7 @@ namespace my {
     public:
         const matrix<Ts, N, M> H() const; // hermitian (conjugate transpose)
         const matrix<Ts, M, N> conj() const; // conjugate
+        const typename Ts::value_type norm() const; // Frobenius norm
     };
 
     //////// //////// //////// //////// 
@@ -123,6 +126,45 @@ namespace my {
         return *static_cast<const matrix<Ts,M,N>*>(this);
     }   
 
+    //////// ////////
+    // Frobenius norm
+    //////// ////////
+
+    //////// //////// //////// //////// 
+    // specialization for complex types
+    //////// //////// //////// //////// 
+    template <typename Ts, const std::size_t M, const std::size_t N>
+    const typename Ts::value_type
+    matrix_base<Ts, M, N, false>::norm() const 
+    {
+        typename Ts::value_type ret(0);
+        for (std::size_t i = 0; i < M; ++i) {
+            for (std::size_t j = 0; j < N; ++j) {
+                ret += (*static_cast<const matrix<Ts,M,N>*>(this))(i,j).real() *
+                    (*static_cast<const matrix<Ts,M,N>*>(this))(i,j).real() +
+                    (*static_cast<const matrix<Ts,M,N>*>(this))(i,j).imag() *
+                    (*static_cast<const matrix<Ts,M,N>*>(this))(i,j).imag();
+            }
+        }
+        return sqrt(ret);
+    }
+
+    //////// //////// //////// //////// 
+    // specialization for real types
+    //////// //////// //////// //////// 
+    template <typename Ts, const std::size_t M, const std::size_t N>
+    const Ts
+    matrix_base<Ts, M, N, true>::norm() const 
+    {
+        Ts ret(0);
+        for (std::size_t i = 0; i < M; ++i) {
+            for (std::size_t j = 0; j < N; ++j) {
+                ret += (*static_cast<const matrix<Ts,M,N>*>(this))(i,j) *
+                    (*static_cast<const matrix<Ts,M,N>*>(this))(i,j);
+            }
+        }
+        return sqrt(ret);
+    }
 
 } // namespace my
 
